@@ -12,5 +12,6 @@ router.post('/api/v1/auth/login', AuthController.login);
 router.put('/api/v1/users/:id', [verifyTokenAuthorization], UsersController.verifyAuthToken);
 router.delete('/api/v1/users/:id', UsersController.delUser, verifyTokenAuthorization);
 router.get('/api/v1/users/find/:id', [verifyTokenAdmin], UsersController.getUser);
+router.get('/api/v1/users', [verifyTokenAdmin], UsersController.getAllUsers);
 
 module.exports = router;
