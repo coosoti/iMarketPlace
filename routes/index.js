@@ -18,5 +18,9 @@ router.get('/api/v1/users/stats', [verifyTokenAdmin], UsersController.getUserSta
 
 // Products
 router.post('/api/v1/products', [verifyTokenAdmin], ProductsController.createProduct);
+router.put('/api/v1/products/:id', [verifyTokenAdmin], ProductsController.updateProduct);
+router.delete('/api/v1/products/:id', [verifyTokenAdmin], ProductsController.delProduct);
+router.get('/api/v1/products/find/:id', ProductsController.getProduct);
+router.get('/api/v1/products', ProductsController.getAllProducts);
 
 module.exports = router;
