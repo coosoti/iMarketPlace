@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import UsersController from '../controllers/UsersController';
 import ProductsController from '../controllers/ProductsController';
+import CartController from '../controllers/CartController';
 import AuthController from '../controllers/AuthController';
 import { verifyToken, verifyTokenAuthorization, verifyTokenAdmin } from '../utils/VerifyToken';
 
@@ -22,5 +23,12 @@ router.put('/api/v1/products/:id', [verifyTokenAdmin], ProductsController.update
 router.delete('/api/v1/products/:id', [verifyTokenAdmin], ProductsController.delProduct);
 router.get('/api/v1/products/find/:id', ProductsController.getProduct);
 router.get('/api/v1/products', ProductsController.getAllProducts);
+
+// Carts
+router.post('/api/v1/mycart', [verifyTokenAuthorization], CartController.createCart);
+router.put('/api/v1/cart/:id', [verifyTokenAuthorization], CartController.updateCart);
+router.delete('/api/v1/cart/:id', [verifyTokenAuthorization], CartController.delCart);
+router.get('/api/v1/cart/find/:userId', CartController.getUserCart);
+router.get('/api/v1/carts', [verifyTokenAdmin], CartController.getAllCarts);
 
 module.exports = router;

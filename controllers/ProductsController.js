@@ -52,7 +52,7 @@ class ProductsController {
     }
   }
 
-  // Get All Users
+  // Get All Products
   static async getAllProducts(req, res) {
     const qNew = req.query.new;
     const qCategory = req.query.category;
