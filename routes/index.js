@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import UsersController from '../controllers/UsersController';
+import ProductsController from '../controllers/ProductsController';
 import AuthController from '../controllers/AuthController';
 import { verifyToken, verifyTokenAuthorization, verifyTokenAdmin } from '../utils/VerifyToken';
 
@@ -14,5 +15,8 @@ router.delete('/api/v1/users/:id', [verifyTokenAuthorization], UsersController.d
 router.get('/api/v1/users/find/:id', [verifyTokenAdmin], UsersController.getUser);
 router.get('/api/v1/users', [verifyTokenAdmin], UsersController.getAllUsers);
 router.get('/api/v1/users/stats', [verifyTokenAdmin], UsersController.getUserStats);
+
+// Products
+router.post('/api/v1/products', [verifyTokenAdmin], ProductsController.createProduct);
 
 module.exports = router;
