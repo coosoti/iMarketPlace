@@ -2,6 +2,8 @@ import { Router } from 'express';
 import UsersController from '../controllers/UsersController';
 import ProductsController from '../controllers/ProductsController';
 import CartController from '../controllers/CartController';
+import OrderController from '../controllers/OrderController';
+import PaymentController from '../controllers/PaymentController';
 import AuthController from '../controllers/AuthController';
 import { verifyToken, verifyTokenAuthorization, verifyTokenAdmin } from '../utils/VerifyToken';
 
@@ -30,5 +32,15 @@ router.put('/api/v1/cart/:id', [verifyTokenAuthorization], CartController.update
 router.delete('/api/v1/cart/:id', [verifyTokenAuthorization], CartController.delCart);
 router.get('/api/v1/cart/find/:userId', CartController.getUserCart);
 router.get('/api/v1/carts', [verifyTokenAdmin], CartController.getAllCarts);
+
+// Orders
+router.post('/api/v1/orders', [verifyToken], OrderController.createOrder);
+router.put('/api/v1/order/:id', [verifyTokenAdmin], OrderController.updateOrder);
+router.delete('/api/v1/order/:id', [verifyTokenAdmin], OrderController.delOrder);
+router.get('/api/v1/orders/find/:userId', [verifyTokenAuthorization], OrderController.getUserOrders);
+router.get('/api/v1/orders', [verifyTokenAdmin], OrderController.getAllOrders);
+router.get('/api/v1/income', [verifyTokenAdmin], OrderController.getMonthlyIncome);
+
+router.post('/api/v1/payment', PaymentController.makePayment);
 
 module.exports = router;
