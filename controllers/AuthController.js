@@ -3,7 +3,8 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User';
 
 const CryptoJS = require('crypto-js');
-const CryptoSecKey = "kulundeng5victorbenosa";
+
+const CryptoSecKey = 'kulundeng5victorbenosa';
 class AuthController {
   // User Registration
   static async register(req, res) {
@@ -13,11 +14,25 @@ class AuthController {
       password: CryptoJS.AES.encrypt(req.body.password, CryptoSecKey).toString(),
     });
 
+    if (!req.body.username) {
+      return res.status(400).json('Missing username').end();
+    }
+    if (!req.body.email) {
+      return res.status(400).json('Missing email').end();
+    }
+    if (!req.body.password) {
+      return res.status(400).json('Missing password').end();
+    }
+
     try {
-      const user = await newUser.save();
-      res.status(201).json(user).end();
+      const user = await User.findOne({ username: req.body.username });
+      if (user) {
+        return res.status(400).json('That user already exists').end();
+      }
+      const userR = await newUser.save();
+      return res.status(201).json(userR).end();
     } catch (err) {
-      res.status(500).json(err).end();
+      res.status(400).json(err).end();
     }
   }
 
@@ -44,12 +59,12 @@ class AuthController {
           isAdmin: user.isAdmin,
         },
         'secretkey',
-        { expiresIn: '1d' }
+        { expiresIn: '1d' },
       );
 
       const { password, ...others } = user._doc;
 
-      res.status(200).json({ ...others, accessToken });
+      res.status(200).json({ ...others, accessToken }).end();
     } catch (err) {
       res.status(500).json(err).end();
     }

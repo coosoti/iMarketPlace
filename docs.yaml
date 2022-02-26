@@ -33,11 +33,48 @@ definitions:
       password:
         type: string
         format: password
-        required:
-          - username
-          - email
-          - password
-          
+    required:
+      - username
+      - email
+      - password
+
+  Product:
+    type: object:
+    properties:
+      title:
+        type: string
+      description:
+        type: string
+      img:
+        type: string
+      categories:
+        type: []
+      size:
+        type:  string
+      colour:
+        type: string
+      price:
+        type: number
+    required:
+      - title
+      - description
+      - img
+      - categories
+      - size
+      - colour
+      - price
+
+  Cart:
+    type: object
+    properties:
+      productId:
+        type: string
+      quantity:
+        type: number
+    required:
+      - productId
+      - quantity
+      
 paths:
   /api/v1/auth/register:
     post:
@@ -86,7 +123,6 @@ paths:
         - name: body
           in: body
           schema:
-            $ref: '#definitions/User'
             type: object
             properties:
               username:
@@ -189,8 +225,9 @@ paths:
         403:
           description: Token is invalid
 
-  /api/v1/users/{id}:
-    DELETE:
+    delete:
+      tags:
+        - Users
       name: Delete a User
       summary: Delete a user from the database
       consumes:
@@ -207,5 +244,274 @@ paths:
       responses:
         200:
           description: User deleted succcessfully
-        500:
-          description: Error
+        401:
+          description: You are not authenticated
+
+  /api/v1/users/stats:
+    get:
+      tags:
+        - Users
+      name: Get stats for Users
+      summary: Retrieves the number of users in the system
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: token
+          in: header
+          security:
+            Bearer: []
+      responses:
+        200:
+          description: Returns user stats
+        401:
+          description: Unauthorized
+
+  /api/v1/products:
+    post:
+      tags:
+        - Products
+      name: Create a Product
+      summary: Creates a new product and save it to the db
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: token
+          in: header
+          security:
+            Bearer: []
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/Product'
+      responses:
+        200:
+          description: Returns the product created
+        401:
+          description: User not authenticated
+        403:
+          description: User not allowed to perform this action
+      
+    get:
+      tags:
+        - Products
+      name: Get all Products
+      summary: Retrieve all products in the database
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        200:
+          description: List of all products
+          schema:
+            type: array
+            products:
+              $ref: '#/definitions/Product'
+        400:
+          description: Bad Request
+
+  /api/v1/products/{id}:
+    get:
+      tags:
+        - Products
+      name: Get one product
+      summary: Retrieves details of one product
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+      responses:
+        200:
+          description: Returns a Product
+        400:
+          description: Bad Request
+
+    put:
+      tags:
+        - Products
+      name: Update of a product
+      summary: Update the details of a product
+      consumes:
+        - application/json
+      products:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+        - name: token
+          in: header
+        - name: body
+          in: body
+          security:
+            Bearer: []
+          schema:
+            type: array
+            $ref: '#/definitions/Product'
+      responses:
+        200:
+          definitions: Update successful
+        401:
+          description: You are not authenticated
+        403:
+          description: Unauthorized
+
+    delete:
+      tags:
+        - Products
+      name: Delete a Product
+      summary: Deletes a product from the database
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+        - name: token
+          in: header
+      responses:
+        200:
+          description: Deleted succcessfully
+        401:
+          description: You are not authenticated
+        403:
+          description: You are not allowed to perform this action
+            
+  /api/v1/carts:
+    post:
+      tags:
+        - Carts
+      name: Creates a Cart
+      summary: Creates a Cart with Products
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: token
+          in: header
+        - name: body
+          in: body
+          security:
+            Bearer: []
+          schema:
+            type: object
+            $ref: '#/definitions/Cart'
+      responses:
+        200:
+          description: Cart Created Successfully
+        401:
+          description: You are not authenticated
+
+    get:
+      tags:
+        - Carts
+      name: Get all Carts - Admin only
+      summary: Retrieves all carts in the system
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: token
+          in: header
+          security:
+            Bearer: []
+      responses:
+        200:
+          description: Get all Carts successfully
+          schema:
+            type: array
+            schema:
+              $ref: '#/definitions/Cart'
+        401:
+          description: You are not authenticated
+        403:
+          description: You are not allowed to perform this action
+          
+  /api/v1/cart/{id}:
+    put:
+      tags:
+        - Carts
+      name: Update Cart content
+      summary: Update details of products in the Cart
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+        - name: token
+          in: header
+          security:
+            Bearer: []
+        - name: body
+          in: body
+          schema:
+            type: object
+            $ref: '#/definitions/Cart'
+            required:
+              - quantity
+      responses:
+        200:
+          description: Returns updated Cart Object
+        401:
+          description: User not authenticated
+    
+    delete:
+      tags:
+        - Carts
+      name: Delete Cart Object
+      summary: User can delete their cart
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+        - name: token
+          in: header
+          security:
+            Bearer: []
+      responses:
+        200:
+          description: Deleted successfully
+        401:
+          description: User not authenticated
+          
+  /api/v1/cart/{userId}:
+    get:
+      tags:
+        - Carts
+      name: Get user Cart
+      summary: Retrieves a User's Cart object
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: userId
+          in: path
+        - name: token
+          in: header
+          security:
+            Bearer: []
+      responses:
+        200:
+          description: Cart Object
+          schema:
+            type: object
+            $ref: '#/definitions/Cart'
+        401:
+          description: User not authenticated
+    
+    

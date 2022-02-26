@@ -22,7 +22,10 @@ class UsersController {
       );
       res.status(200).json(updatedUser).end();
     } catch (err) {
-      res.status(500).json(err).end();
+      if (err.statusCode === 401) {
+        res.status(401).json(err).end();
+      }
+      res.status(403).json(err).end();
     }
   }
 
@@ -32,7 +35,7 @@ class UsersController {
       await User.findByIdAndDelete(req.params.id);
       res.status(200).json('User has been deleted...').end();
     } catch (err) {
-      res.status(500).json(err).end();
+      res.status(401).json(err).end();
     }
   }
 
@@ -43,7 +46,10 @@ class UsersController {
       const { password, ...others } = user._doc;
       res.status(200).json(others).end();
     } catch (err) {
-      res.status(500).json(err).end();
+      if (err.statusCode === 401) {
+        return res.status(401).json(err).end();
+      }
+      return res.status(403).json(err).end();
     }
   }
 
@@ -52,11 +58,14 @@ class UsersController {
     const query = req.query.new;
     try {
       const users = query
-        ? await User.find().sort({ _id: -1 }).limit(5)
-        : await User.find();
+            ? await User.find().sort({ _id: -1 }).limit(5)
+            : await User.find();
       res.status(200).json(users).end();
     } catch (err) {
-      res.status(500).json(err).end();
+      if (err.statusCode === 401) {
+        return res.status(401).json(err).end();
+      }
+      return res.status(403).json(err).end();
     }
   }
 
@@ -70,19 +79,19 @@ class UsersController {
         { $match: { createdAt: { $gte: lastYear } } },
         {
           $project: {
-            month: { $month: "$createdAt" },
+            month: { $month: '$createdAt' },
           },
         },
         {
           $group: {
-            _id: "$month",
-            total: { $sum: 1},
+            _id: '$month',
+            total: { $sum: 1 },
           },
         },
       ]);
       res.status(200).json(data).end();
-    } catch(err) {
-      res.status(500).json(err).end();
+    } catch (err) {
+      res.status(401).json(err).end();
     }
   }
 }
